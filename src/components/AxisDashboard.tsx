@@ -30,19 +30,12 @@ const debounce = (fn: Function, delay: number) => {
 };
 
 interface AxisDashboardProps {
-  leadIMeasurements: QRSMeasurements;
-  leadIIMeasurements: QRSMeasurements;
+  leadIMeasurements?: QRSMeasurements;
+  leadIIMeasurements?: QRSMeasurements;
   arrowColor?: string; // Optional prop to set arrow color
   selectedAxisType?: string; // The axis type selected by the user
   axisAngle: number; // Current axis angle from parent
-  onAxisChange?: (axis: number, deflections: {
-    leadI: QRSDeflection;
-    leadII: QRSDeflection;
-    leadIII: QRSDeflection;
-    aVR: QRSDeflection;
-    aVL: QRSDeflection;
-    aVF: QRSDeflection;
-  }) => void; // Callback to update QRS deflections
+  onAxisChange?: (axis: number, deflections: LimbLeadDeflections) => void; // Callback to update QRS deflections
 }
 
 const AxisDashboard: React.FC<AxisDashboardProps> = ({ 
@@ -70,9 +63,23 @@ const AxisDashboard: React.FC<AxisDashboardProps> = ({
   // Calculate areas with error handling
   let leadIArea = 0;
   let leadIIArea = 0;
+  
+  // Default QRS measurements if not provided
+  const defaultQRSMeasurements: QRSMeasurements = {
+    qDuration: 1,
+    qAmplitude: 0,
+    rAmplitude: 1,
+    sAmplitude: 0,
+    sDuration: 1
+  };
+  
+  // Use provided measurements or defaults
+  const safeLeadIMeasurements = leadIMeasurements || defaultQRSMeasurements;
+  const safeLeadIIMeasurements = leadIIMeasurements || defaultQRSMeasurements;
+  
   try {
-    leadIArea = calculateQRSArea(leadIMeasurements);
-    leadIIArea = calculateQRSArea(leadIIMeasurements);
+    leadIArea = calculateQRSArea(safeLeadIMeasurements);
+    leadIIArea = calculateQRSArea(safeLeadIIMeasurements);
   } catch (error) {
     // Silently handle error
   }
@@ -299,19 +306,22 @@ const AxisDashboard: React.FC<AxisDashboardProps> = ({
     }
   }, [selectedAxisType, onAxisChange]);
   
-  // Use the axis value to determine the classification
+  // Get the classification of the current axis angle
   const axisClassification = classifyAxisValue(axisAngle);
-  
-  // Check if axis is normal or abnormal (not in normal range)
-  const isNormal = axisClassification === 'Normal';
-  
-  // Create a CSS class based on the axis classification
-  const axisValueClass = `axis-value ${isNormal ? 'normal' : 'abnormal'}`;
+  // Determine class for the axis value display based on classification
+  const axisValueClass = `axis-value ${axisClassification === 'Normal Axis' ? 'normal' : 'abnormal'}`;
 
   // Format axis for display
   const formatAxis = (axis: number | null): string => {
-    if (axis === null) return 'Indeterminate';
-    return `${axis.toFixed(1)}°`;
+    if (axis === null) return "N/A";
+    
+    // Round to nearest whole number
+    const roundedAxis = Math.round(axis);
+    
+    // Format with sign
+    return roundedAxis > 0 
+      ? `+${roundedAxis}°` 
+      : `${roundedAxis}°`;
   };
 
   // Exit early if we don't have valid measurements
@@ -388,132 +398,59 @@ const AxisDashboard: React.FC<AxisDashboardProps> = ({
   const leftWingY = headBaseY + perpY;
   const rightWingX = headBaseX - perpX;
   const rightWingY = headBaseY - perpY;
-  
-  // Get measurements for display based on leadIMeasurements and leadIIMeasurements from props
-  const displayLeadI = leadIMeasurements;
-  const displayLeadII = leadIIMeasurements;
-  
-  // Recalculate areas based on the measurements from props
-  let displayLeadIArea = 0;
-  let displayLeadIIArea = 0;
-  try {
-    displayLeadIArea = calculateQRSArea(displayLeadI);
-    displayLeadIIArea = calculateQRSArea(displayLeadII);
-  } catch (error) {
-    // Silently handle error
-  }
 
   return (
-    <div className="measurements-grid">
-      <div className="lead-measurements">
-        <h3>Lead I</h3>
-        <div className="measurement-row">
-          <span>Q Wave:</span>
-          <span>{displayLeadI.qAmplitude.toFixed(1)} mm</span>
-        </div>
-        <div className="measurement-row">
-          <span>R Wave:</span>
-          <span>{displayLeadI.rAmplitude.toFixed(1)} mm</span>
-        </div>
-        <div className="measurement-row">
-          <span>S Wave:</span>
-          <span>{displayLeadI.sAmplitude.toFixed(1)} mm</span>
-        </div>
-        <div className="measurement-row total">
-          <span>Net Area:</span>
-          <span>{displayLeadIArea.toFixed(1)} mm²</span>
-        </div>
-      </div>
-
-      <div className="lead-measurements">
-        <h3>Lead II</h3>
-        <div className="measurement-row">
-          <span>Q Wave:</span>
-          <span>{displayLeadII.qAmplitude.toFixed(1)} mm</span>
-        </div>
-        <div className="measurement-row">
-          <span>R Wave:</span>
-          <span>{displayLeadII.rAmplitude.toFixed(1)} mm</span>
-        </div>
-        <div className="measurement-row">
-          <span>S Wave:</span>
-          <span>{displayLeadII.sAmplitude.toFixed(1)} mm</span>
-        </div>
-        <div className="measurement-row total">
-          <span>Net Area:</span>
-          <span>{displayLeadIIArea.toFixed(1)} mm²</span>
-        </div>
-      </div>
-
-      <div className="axis-result">
-        <h3>Mean QRS Axis</h3>
-        <div className={axisValueClass}>
-          {formatAxis(axisAngle)}
-          <div className="axis-classification">{axisClassification}</div>
-        </div>
-      </div>
-
-      <div className="axis-compass">
-        <div className="compass-circle">
-          <div className="compass-marker right">0°</div>
-          <div className="compass-marker bottom">+90°</div>
-          <div className="compass-marker left">±180°</div>
-          <div className="compass-marker top">-90°</div>
-          
-          <svg 
-            ref={svgRef}
-            viewBox="-50 -50 100 100" 
-            style={{ 
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              cursor: 'pointer',
-              touchAction: 'none' // Prevent default touch actions to avoid scrolling while dragging
-            }}
-            onPointerDown={handleMouseDown}
-          >
-            {/* Degree markers */}
-            {generateDegreeMarkers()}
-            
-            {/* Circle border */}
-            <circle
-              cx="0"
-              cy="0"
-              r="48"
-              fill="none"
-              stroke="#333"
-              strokeWidth="1.25"
-            />
-            
-            {/* Improved arrow shaft with better line cap */}
-            <line 
-              x1="0" 
-              y1="0" 
-              x2={headBaseX} 
-              y2={headBaseY} 
-              stroke={arrowColor} 
-              strokeWidth="2"
-              strokeLinecap="butt"
-            />
-            
-            {/* Sharper arrowhead as polygon */}
-            <polygon 
-              points={`${tipX},${tipY} ${leftWingX},${leftWingY} ${rightWingX},${rightWingY}`} 
-              fill={arrowColor}
-              stroke="none"
-            />
-            
-            {/* Center dot */}
-            <circle 
-              cx="0" 
-              cy="0" 
-              r="2.25" 
-              fill={arrowColor}
-            />
-          </svg>
-        </div>
-      </div>
-    </div>
+    <svg 
+      ref={svgRef}
+      viewBox="-50 -50 100 100" 
+      style={{ 
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        cursor: 'pointer',
+        touchAction: 'none' // Prevent default touch actions to avoid scrolling while dragging
+      }}
+      onPointerDown={handleMouseDown}
+    >
+      {/* Degree markers */}
+      {generateDegreeMarkers()}
+      
+      {/* Circle border */}
+      <circle
+        cx="0"
+        cy="0"
+        r="48"
+        fill="none"
+        stroke="#333"
+        strokeWidth="1.25"
+      />
+      
+      {/* Improved arrow shaft with better line cap */}
+      <line 
+        x1="0" 
+        y1="0" 
+        x2={headBaseX} 
+        y2={headBaseY} 
+        stroke={arrowColor} 
+        strokeWidth="2"
+        strokeLinecap="butt"
+      />
+      
+      {/* Sharper arrowhead as polygon */}
+      <polygon 
+        points={`${tipX},${tipY} ${leftWingX},${leftWingY} ${rightWingX},${rightWingY}`} 
+        fill={arrowColor}
+        stroke="none"
+      />
+      
+      {/* Center dot */}
+      <circle 
+        cx="0" 
+        cy="0" 
+        r="2.25" 
+        fill={arrowColor}
+      />
+    </svg>
   );
 };
 

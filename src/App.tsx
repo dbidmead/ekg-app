@@ -202,94 +202,105 @@ const App: React.FC = () => {
         <h1>EKG Axis Trainer</h1>
         
         <div className="main-content">
-          <div className="ekg-grid">
-            <div className="lead-container">
-              <h3>Lead I</h3>
-              <div className="tracing-container">
-                <EKGTracing lead="I" axisAngle={axisAngle} />
+          <div className="left-panel">
+            <div className="ekg-grid">
+              <div className="lead-container">
+                <h3>Lead I</h3>
+                <div className="tracing-container">
+                  <EKGTracing lead="I" axisAngle={axisAngle} />
+                </div>
               </div>
-            </div>
-            <div className="lead-container">
-              <h3>aVR</h3>
-              <div className="tracing-container">
-                <EKGTracing lead="aVR" axisAngle={axisAngle} />
+              <div className="lead-container">
+                <h3>aVR</h3>
+                <div className="tracing-container">
+                  <EKGTracing lead="aVR" axisAngle={axisAngle} />
+                </div>
               </div>
-            </div>
-            <div className="lead-container">
-              <h3>Lead II</h3>
-              <div className="tracing-container">
-                <EKGTracing lead="II" axisAngle={axisAngle} />
+              <div className="lead-container">
+                <h3>Lead II</h3>
+                <div className="tracing-container">
+                  <EKGTracing lead="II" axisAngle={axisAngle} />
+                </div>
               </div>
-            </div>
-            <div className="lead-container">
-              <h3>aVL</h3>
-              <div className="tracing-container">
-                <EKGTracing lead="aVL" axisAngle={axisAngle} />
+              <div className="lead-container">
+                <h3>aVL</h3>
+                <div className="tracing-container">
+                  <EKGTracing lead="aVL" axisAngle={axisAngle} />
+                </div>
               </div>
-            </div>
-            <div className="lead-container">
-              <h3>Lead III</h3>
-              <div className="tracing-container">
-                <EKGTracing lead="III" axisAngle={axisAngle} />
+              <div className="lead-container">
+                <h3>Lead III</h3>
+                <div className="tracing-container">
+                  <EKGTracing lead="III" axisAngle={axisAngle} />
+                </div>
               </div>
-            </div>
-            <div className="lead-container">
-              <h3>aVF</h3>
-              <div className="tracing-container">
-                <EKGTracing lead="aVF" axisAngle={axisAngle} />
+              <div className="lead-container">
+                <h3>aVF</h3>
+                <div className="tracing-container">
+                  <EKGTracing lead="aVF" axisAngle={axisAngle} />
+                </div>
               </div>
             </div>
           </div>
 
           <div className="preset-controls">
-            <h2>Preset Axis Angles</h2>
             <div className="preset-buttons">
               <button 
                 className={`preset-button ${selectedAxis === 'normal' ? 'active' : ''}`}
                 onClick={() => handlePresetAxisClick('normal')}
               >
-                Normal Axis
-                <span className="degrees">+60°</span>
+                Normal Axis <span className="degrees">+60°</span>
               </button>
-              
               <button 
                 className={`preset-button ${selectedAxis === 'left' ? 'active' : ''}`}
                 onClick={() => handlePresetAxisClick('left')}
               >
-                Left Axis Deviation
-                <span className="degrees">-45°</span>
+                Left Axis Deviation <span className="degrees">-45°</span>
               </button>
-              
               <button 
                 className={`preset-button ${selectedAxis === 'right' ? 'active' : ''}`}
                 onClick={() => handlePresetAxisClick('right')}
               >
-                Right Axis Deviation
-                <span className="degrees">+120°</span>
+                Right Axis Deviation <span className="degrees">+120°</span>
               </button>
-              
               <button 
                 className={`preset-button ${selectedAxis === 'extreme' ? 'active' : ''}`}
                 onClick={() => handlePresetAxisClick('extreme')}
               >
-                Extreme Axis Deviation
-                <span className="degrees">-135°</span>
+                Extreme Axis Deviation <span className="degrees">-135°</span>
               </button>
             </div>
             
-            <p className="drag-instructions">Or click and drag the compass arrow below to set a custom axis angle</p>
-          </div>
-        </div>
+            <div className="compass-container">
+              <div className="compass-circle">
+                <div className="compass-marker right">0°</div>
+                <div className="compass-marker bottom">+90°</div>
+                <div className="compass-marker left">±180°</div>
+                <div className="compass-marker top">-90°</div>
+                <AxisDashboard 
+                  axisAngle={axisAngle} 
+                  onAxisChange={handleAxisChange}
+                  selectedAxisType={selectedAxis}
+                  arrowColor="#0066cc"
+                />
+              </div>
+            </div>
 
-        <div className="dashboard-section">
-          <AxisDashboard
-            leadIMeasurements={leadIMeasurements}
-            leadIIMeasurements={leadIIMeasurements}
-            arrowColor="#0066cc" 
-            selectedAxisType={selectedAxis}
-            axisAngle={axisAngle}
-            onAxisChange={handleAxisChange}
-          />
+            <div className="dashboard-section">
+              <div className={`axis-value ${axisAngle >= -30 && axisAngle <= 90 ? 'normal' : 'abnormal'}`}>
+                {axisAngle > 0 ? `+${Math.round(axisAngle)}°` : `${Math.round(axisAngle)}°`}
+              </div>
+              <div className="axis-classification">
+                {axisAngle >= -30 && axisAngle <= 90 
+                  ? 'Normal Axis' 
+                  : axisAngle > 90 && axisAngle <= 180 
+                    ? 'Right Axis Deviation'
+                    : axisAngle < -30 && axisAngle >= -90
+                      ? 'Left Axis Deviation'
+                      : 'Extreme Axis Deviation'}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </>
