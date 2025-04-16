@@ -1,0 +1,143 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: #1a1a1a;
+  height: fit-content;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #4a9eff;
+  font-weight: 600;
+  font-size: 1.8rem;
+}
+
+.main-content {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.ekg-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  width: 800px;
+}
+
+.ekg-lead {
+  background-color: #2d2d2d;
+  border: 1px solid #404040;
+  border-radius: 8px;
+  padding: 0.8rem;
+  text-align: center;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ekg-lead h3 {
+  margin: 0 0 0.8rem 0;
+  color: #e0e0e0;
+  font-size: 1rem;
+}
+
+.tracing-container {
+  flex: 1;
+  background-color: #1a1a1a;
+  border: 1px solid #404040;
+  border-radius: 4px;
+  min-height: 100px;
+}
+
+.axis-selection {
+  background-color: #2d2d2d;
+  border: 1px solid #404040;
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 250px;
+  height: fit-content;
+}
+
+.axis-selection h2 {
+  margin-top: 0;
+  text-align: center;
+  color: #4a9eff;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: #e0e0e0;
+  padding: 0.4rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.radio-group label:hover {
+  background-color: #404040;
+  color: #4a9eff;
+}
+
+.radio-group input[type="radio"] {
+  margin: 0;
+  accent-color: #4a9eff;
+}
