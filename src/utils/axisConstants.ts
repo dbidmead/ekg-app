@@ -19,6 +19,22 @@ export const AXIS_VALUES = {
   EXTREME: -135 // Representative value for extreme axis deviation
 };
 
+// Standard limb lead names
+export const LEADS = ['I', 'II', 'III', 'aVR', 'aVL', 'aVF'];
+
+// Lead angles in the frontal plane (degrees)
+export const LEAD_ANGLES = {
+  I: 0,
+  II: 60,
+  III: 120,
+  aVR: -150,
+  aVL: -30,
+  aVF: 90
+};
+
+// Maximum allowed deflection amplitude for QRS complex (in mm)
+export const MAX_DEFLECTION = 15;
+
 // Mapping between selection values and axis type
 export const AXIS_TYPE_MAP = {
   'normal': 'NORMAL',

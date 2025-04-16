@@ -63,6 +63,14 @@ h1 {
   align-items: center;
   justify-content: center;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 1200px) {
+  .main-content {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
 }
 
 .ekg-grid {
@@ -75,6 +83,8 @@ h1 {
     "lead-iii avf";
   gap: 1.5rem;
   width: 700px;
+  max-width: 100%;
+  margin-bottom: 1.5rem;
 }
 
 .ekg-grid .lead-container:nth-child(1) { grid-area: lead-i; }
@@ -315,6 +325,8 @@ h1 {
   justify-content: center;
   overflow: visible;
   margin: 0.5rem;
+  user-select: none; /* Prevent text selection during drag */
+  cursor: grab;
 }
 
 .compass-circle svg {
@@ -443,4 +455,101 @@ h1 {
   color: #808080;
   font-size: 0.9rem;
   margin: 0.25rem 0;
+}
+
+.instructions {
+  background-color: #f5f9ff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.instructions h2 {
+  margin-top: 0;
+  color: #0066cc;
+  font-size: 1.4rem;
+}
+
+.instructions p {
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+
+/* Preset controls styles */
+.preset-controls {
+  background-color: #2d2d2d;
+  border: 1px solid #404040;
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 350px;
+  min-width: 300px;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 auto;
+  margin-bottom: 1.5rem;
+}
+
+.preset-controls h2 {
+  color: #4a9eff;
+  font-size: 1.2rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.preset-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.preset-button {
+  position: relative;
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 0.8rem;
+  color: #e0e0e0;
+  font-size: 0.9rem;
+  text-align: left;
+  transition: all 0.2s;
+  cursor: pointer;
+  outline: none;
+}
+
+.preset-button:hover {
+  background-color: #292929;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.preset-button.active {
+  background-color: #0b3b70;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 1px #0066cc;
+}
+
+.preset-button .degrees {
+  position: absolute;
+  right: 12px;
+  font-weight: bold;
+  color: #4a9eff;
+  font-family: monospace;
+}
+
+.drag-instructions {
+  color: #a0a0a0;
+  font-size: 0.85rem;
+  margin-top: 1.2rem;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.compass-circle:active {
+  cursor: grabbing;
 }
