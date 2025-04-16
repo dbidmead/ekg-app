@@ -1,4 +1,5 @@
 import './App.css'
+import EKGTracing from './components/EKGTracing'
 
 function App() {
   return (
@@ -10,27 +11,39 @@ function App() {
           {/* Left Column */}
           <div className="ekg-lead">
             <h3>Lead I</h3>
-            <div className="tracing-container"></div>
+            <div className="tracing-container">
+              <EKGTracing lead="I" />
+            </div>
           </div>
           <div className="ekg-lead">
             <h3>aVR</h3>
-            <div className="tracing-container"></div>
+            <div className="tracing-container">
+              <EKGTracing lead="aVR" />
+            </div>
           </div>
           <div className="ekg-lead">
             <h3>Lead II</h3>
-            <div className="tracing-container"></div>
+            <div className="tracing-container">
+              <EKGTracing lead="II" />
+            </div>
           </div>
           <div className="ekg-lead">
             <h3>aVL</h3>
-            <div className="tracing-container"></div>
+            <div className="tracing-container">
+              <EKGTracing lead="aVL" />
+            </div>
           </div>
           <div className="ekg-lead">
             <h3>Lead III</h3>
-            <div className="tracing-container"></div>
+            <div className="tracing-container">
+              <EKGTracing lead="III" />
+            </div>
           </div>
           <div className="ekg-lead">
             <h3>aVF</h3>
-            <div className="tracing-container"></div>
+            <div className="tracing-container">
+              <EKGTracing lead="aVF" />
+            </div>
           </div>
         </div>
 
