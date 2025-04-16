@@ -1,0 +1,181 @@
+// BACKUP FILE - kept for reference
+// Original SimpleAxisDashboard.tsx
+
+import React from 'react';
+import { QRSMeasurements, calculateQRSArea, calculateQRSAxis, classifyAxis, formatAxis } from '../utils/axisCalculations';
+
+interface SimpleAxisDashboardProps {
+  leadIMeasurements: QRSMeasurements;
+  leadIIMeasurements: QRSMeasurements;
+}
+
+const SimpleAxisDashboard: React.FC<SimpleAxisDashboardProps> = ({ leadIMeasurements, leadIIMeasurements }) => {
+  // Calculate areas with error handling
+  let leadIArea = 0;
+  let leadIIArea = 0;
+  try {
+    leadIArea = calculateQRSArea(leadIMeasurements);
+    leadIIArea = calculateQRSArea(leadIIMeasurements);
+  } catch (error) {
+    console.error('Error calculating QRS areas:', error);
+  }
+
+  // Calculate axis
+  const axis = calculateQRSAxis(leadIArea, leadIIArea);
+  const axisClassification = classifyAxis(axis);
+
+  // Generate degree markers
+  const generateDegreeMarkers = () => {
+    const markers = [];
+    const CIRCLE_RADIUS = 48;
+    const HASH_RADIUS = 48.5; // Slightly larger to ensure visual connection
+    
+    for (let degree = 0; degree < 360; degree += 1) {
+      const angle = (degree * Math.PI) / 180;
+      const length = degree % 30 === 0 ? 8 : degree % 10 === 0 ? 5 : degree % 5 === 0 ? 3 : 1;
+      
+      // Start slightly outside the circle border to ensure visual connection
+      const x1 = HASH_RADIUS * Math.cos(angle);
+      const y1 = HASH_RADIUS * Math.sin(angle);
+      // Project inward by the mark length
+      const x2 = (CIRCLE_RADIUS - length) * Math.cos(angle);
+      const y2 = (CIRCLE_RADIUS - length) * Math.sin(angle);
+      
+      markers.push(
+        <line
+          key={degree}
+          x1={x1}
+          y1={y1}
+          x2={x2}
+          y2={y2}
+          stroke="#333"
+          strokeWidth={degree % 30 === 0 ? "1.0" : degree % 10 === 0 ? "0.75" : "0.5"}
+          strokeLinecap="butt"
+          vectorEffect="non-scaling-stroke"
+        />
+      );
+    }
+    return markers;
+  };
+
+  return (
+    <div className="measurements-grid">
+      <div className="lead-measurements">
+        <h3>Lead I</h3>
+        <div className="measurement-row">
+          <span>Q Wave:</span>
+          <span>{leadIMeasurements.qAmplitude.toFixed(1)} mm</span>
+        </div>
+        <div className="measurement-row">
+          <span>R Wave:</span>
+          <span>{leadIMeasurements.rAmplitude.toFixed(1)} mm</span>
+        </div>
+        <div className="measurement-row">
+          <span>S Wave:</span>
+          <span>{leadIMeasurements.sAmplitude.toFixed(1)} mm</span>
+        </div>
+        <div className="measurement-row total">
+          <span>Net Area:</span>
+          <span>{leadIArea.toFixed(1)} mm²</span>
+        </div>
+      </div>
+
+      <div className="lead-measurements">
+        <h3>Lead II</h3>
+        <div className="measurement-row">
+          <span>Q Wave:</span>
+          <span>{leadIIMeasurements.qAmplitude.toFixed(1)} mm</span>
+        </div>
+        <div className="measurement-row">
+          <span>R Wave:</span>
+          <span>{leadIIMeasurements.rAmplitude.toFixed(1)} mm</span>
+        </div>
+        <div className="measurement-row">
+          <span>S Wave:</span>
+          <span>{leadIIMeasurements.sAmplitude.toFixed(1)} mm</span>
+        </div>
+        <div className="measurement-row total">
+          <span>Net Area:</span>
+          <span>{leadIIArea.toFixed(1)} mm²</span>
+        </div>
+      </div>
+
+      <div className="axis-result">
+        <h3>Mean QRS Axis</h3>
+        <div className="axis-value">{formatAxis(axis)}</div>
+        <div className="axis-classification">{axisClassification}</div>
+      </div>
+
+      <div className="axis-compass">
+        <div className="compass-circle" style={{ transform: 'rotate(-90deg)' }}>
+          <div className="compass-marker north">0°</div>
+          <div className="compass-marker east">90°</div>
+          <div className="compass-marker south">180°</div>
+          <div className="compass-marker west">-90°</div>
+          <svg 
+            viewBox="-50 -50 100 100" 
+            style={{ 
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+            }}
+          >
+            {/* Degree markers first, so circle stroke appears on top */}
+            {generateDegreeMarkers()}
+            
+            {/* Circle border */}
+            <circle
+              cx="0"
+              cy="0"
+              r="48"
+              fill="none"
+              stroke="#333"
+              strokeWidth="1.25"
+            />
+          </svg>
+          <svg 
+            viewBox="-50 -50 100 100" 
+            style={{ 
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              transform: `rotate(${axis ?? 0 - 90}deg)`
+            }}
+          >
+            <line 
+              x1="0" 
+              y1="0" 
+              x2="0" 
+              y2="-43" 
+              stroke="#0066cc" 
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+            <polygon 
+              points="0,-48 5,-38 -5,-38" 
+              fill="#0066cc"
+            />
+          </svg>
+          <svg 
+            viewBox="-50 -50 100 100" 
+            style={{ 
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              pointerEvents: 'none'
+            }}
+          >
+            <circle 
+              cx="0" 
+              cy="0" 
+              r="2.25" 
+              fill="#0066cc"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SimpleAxisDashboard; 
