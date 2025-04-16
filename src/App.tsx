@@ -149,12 +149,48 @@ const App: React.FC = () => {
     
     setSelectedAxis(axisType);
     
-    // Get the axis angle value for this preset
-    const axisValue = AXIS_VALUES[AXIS_TYPE_MAP[axisType as keyof typeof AXIS_TYPE_MAP] as keyof typeof AXIS_VALUES];
+    // Use exact values as displayed on the buttons
+    let axisValue: number;
+    switch(axisType) {
+      case 'normal':
+        axisValue = 60; // +60°
+        break;
+      case 'left':
+        axisValue = -45; // -45°
+        break;
+      case 'right':
+        axisValue = 120; // +120°
+        break;
+      case 'extreme':
+        axisValue = -135; // -135°
+        break;
+      default:
+        axisValue = 60; // Default to normal axis
+    }
     
-    // Set the axis angle and calculate new deflections
+    // Calculate deflections for this preset axis value
+    const deflections = getCachedDeflections(axisValue);
+    
+    // Set the axis angle and QRS deflections
     setAxisAngle(axisValue);
-    setQrsDeflections(getCachedDeflections(axisValue));
+    setQrsDeflections(deflections);
+    
+    // Also update lead measurements to ensure consistency
+    setLeadIMeasurements({
+      qDuration: 1,
+      qAmplitude: roundToDecimal(deflections.leadI.q),
+      rAmplitude: roundToDecimal(deflections.leadI.r),
+      sAmplitude: roundToDecimal(deflections.leadI.s),
+      sDuration: 1
+    });
+    
+    setLeadIIMeasurements({
+      qDuration: 1,
+      qAmplitude: roundToDecimal(deflections.leadII.q),
+      rAmplitude: roundToDecimal(deflections.leadII.r),
+      sAmplitude: roundToDecimal(deflections.leadII.s),
+      sDuration: 1
+    });
   }, []);
 
   // Flag to determine which approach to use for EKG rendering
@@ -251,6 +287,7 @@ const App: React.FC = () => {
             leadIIMeasurements={leadIIMeasurements}
             arrowColor="#0066cc" 
             selectedAxisType={selectedAxis}
+            axisAngle={axisAngle}
             onAxisChange={handleAxisChange}
           />
         </div>

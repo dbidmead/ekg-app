@@ -34,6 +34,7 @@ interface AxisDashboardProps {
   leadIIMeasurements: QRSMeasurements;
   arrowColor?: string; // Optional prop to set arrow color
   selectedAxisType?: string; // The axis type selected by the user
+  axisAngle: number; // Current axis angle from parent
   onAxisChange?: (axis: number, deflections: {
     leadI: QRSDeflection;
     leadII: QRSDeflection;
@@ -49,16 +50,22 @@ const AxisDashboard: React.FC<AxisDashboardProps> = ({
   leadIIMeasurements,
   arrowColor = '#0066cc', // Default to blue
   selectedAxisType = '',
+  axisAngle = 60, // Default if not provided
   onAxisChange
 }) => {
-  // State for the current axis angle
-  const [axisAngle, setAxisAngle] = useState<number>(0);
+  // We no longer need local axis angle state since we're using the parent's
+  // const [axisAngle, setAxisAngle] = useState<number>(0);
   
   // Refs for tracking drag state and animation
   const svgRef = useRef<SVGSVGElement>(null);
   const isDragging = useRef<boolean>(false);
-  const lastAngle = useRef<number>(0);
+  const lastAngle = useRef<number>(axisAngle); // Initialize with parent's value
   const userInteractionRef = useRef<boolean>(false); // Track if user has interacted
+  
+  // Update lastAngle.current when axisAngle prop changes
+  useEffect(() => {
+    lastAngle.current = axisAngle;
+  }, [axisAngle]);
   
   // Calculate areas with error handling
   let leadIArea = 0;
@@ -70,6 +77,8 @@ const AxisDashboard: React.FC<AxisDashboardProps> = ({
     // Silently handle error
   }
 
+  /* 
+  // This effect is no longer needed since we use the parent's axis angle
   // Set initial axis angle based on measurements
   useEffect(() => {
     // Skip this update if the user is actively interacting with the control
@@ -83,10 +92,10 @@ const AxisDashboard: React.FC<AxisDashboardProps> = ({
       let normalizedAxis = ((rawAxis % 360) + 360) % 360;
       if (normalizedAxis > 180) normalizedAxis -= 360;
       
-      setAxisAngle(normalizedAxis);
       lastAngle.current = normalizedAxis;
     }
   }, [leadIArea, leadIIArea]);
+  */
   
   // Throttled function to update parent component with new angle and deflections
   // This ensures real-time updates without overwhelming the system
@@ -113,10 +122,9 @@ const AxisDashboard: React.FC<AxisDashboardProps> = ({
     [onAxisChange]
   );
   
-  // Update local angle state and parent component when angle changes during drag
+  // Update parent component when angle changes during drag
   const updateAngle = useCallback((newAngle: number) => {
-    // Update local state immediately for responsive UI
-    setAxisAngle(newAngle);
+    // Store in ref for local tracking
     lastAngle.current = newAngle;
     
     // Update parent component (throttled) during drag
@@ -255,18 +263,41 @@ const AxisDashboard: React.FC<AxisDashboardProps> = ({
     };
   }, [handleMouseMove, handleMouseUp, handlePointerMove]);
   
-  // Move the new useEffect hook here, after all existing hooks
   // Update axis when selectedAxisType changes (from preset buttons)
   useEffect(() => {
     if (selectedAxisType) {
-      // A preset was clicked in the parent component
-      // Let's set userInteractionRef to false to allow the measurements-based update
-      userInteractionRef.current = false;
+      // Use exact values as displayed on the buttons
+      let axisValue: number;
+      switch(selectedAxisType) {
+        case 'normal':
+          axisValue = 60; // +60°
+          break;
+        case 'left':
+          axisValue = -45; // -45°
+          break;
+        case 'right':
+          axisValue = 120; // +120°
+          break;
+        case 'extreme':
+          axisValue = -135; // -135°
+          break;
+        default:
+          axisValue = 60; // Default to normal axis
+      }
       
-      // The axisAngle will be updated via the leadIMeasurements+leadIIMeasurements effect
-      // so we don't need to do anything else here
+      // Store current angle in ref for local tracking
+      lastAngle.current = axisValue;
+      
+      // Notify parent component to update the actual angle state
+      if (onAxisChange) {
+        const deflections = generateRealisticQRSDeflections(axisValue);
+        onAxisChange(axisValue, deflections);
+      }
+      
+      // Allow future updates from measurements
+      userInteractionRef.current = false;
     }
-  }, [selectedAxisType]);
+  }, [selectedAxisType, onAxisChange]);
   
   // Use the axis value to determine the classification
   const axisClassification = classifyAxisValue(axisAngle);
