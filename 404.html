@@ -2,34 +2,19 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Single Page App Redirect</title>
+  <title>Page Not Found</title>
   <script>
     // Single Page Apps for GitHub Pages
-    // MIT License
     // https://github.com/rafgraph/spa-github-pages
-    // This script takes the current URL and converts the path and query
-    // string into just a query string, and then redirects the browser
-    // to the new URL with only a query string and hash fragment.
+    const pathSegmentsToKeep = 1; // Keeps /ekg-app/ but nothing after
     
-    // Redirect to the actual site base URL
-    const segmentCount = 1; // For "username.github.io/repo-name", this should be 1
     const l = window.location;
-    
-    // GitHub Pages repo name
-    const repoName = 'ekg-app';
-    
     const redirectUrl = 
       l.protocol + '//' + l.hostname + 
       (l.port ? ':' + l.port : '') +
-      '/' + repoName + '/' +
-      l.pathname
-        .split('/')
-        .slice(segmentCount + 1)
-        .join('/') +
-      (l.search ? l.search : '') +
+      l.pathname.split('/').slice(0, pathSegmentsToKeep + 1).join('/') + '/' +
       (l.hash ? l.hash : '');
     
-    console.log('Redirecting to:', redirectUrl);
     window.location.replace(redirectUrl);
   </script>
 </head>
