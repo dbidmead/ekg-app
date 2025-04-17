@@ -5,29 +5,21 @@
     <link rel="icon" type="image/svg+xml" href="/ekg-app/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EKG Axis Trainer</title>
-    <script type="text/javascript">
-      // Check if we're in a production environment (GitHub Pages)
-      if (window.location.hostname.includes('github.io')) {
-        // Force a redirect to the properly built app
-        window.location.replace('/ekg-app/');
-      }
-
-      // Add a fallback for script load errors
-      window.addEventListener('error', function(e) {
-        if (e.target && e.target.tagName === 'SCRIPT' && 
-            e.target.src && e.target.src.includes('/src/main.tsx')) {
-          console.error('Error loading script:', e);
-          window.location.replace('/ekg-app/');
-          e.preventDefault();
-          return false;
-        }
-      }, true);
-    </script>
     <script type="module" crossorigin src="/ekg-app/assets/main-B5Qt9EMX.js"></script>
-  </head>
+  
+        <script>
+          // GitHub Pages specific redirect
+          if (window.location.hostname.includes('github.io') && 
+              !window.location.pathname.startsWith('/ekg-app/') && 
+              !sessionStorage.getItem('redirected')) {
+            sessionStorage.setItem('redirected', 'true');
+            window.location.replace('/ekg-app/');
+          }
+        </script>
+      </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/ekg-app/src/main.tsx"></script>
+    
   </body>
 </html>
 
