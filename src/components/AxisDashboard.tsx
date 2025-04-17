@@ -1,8 +1,5 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { QRSMeasurements } from '../utils/axisCalculations';
-import { 
-  classifyAxisValue
-} from '../utils/axisConstants';
 import { generateRealisticQRSDeflections, LimbLeadDeflections } from '../utils/qrsDeflectionCalculator';
 
 // Simple throttle function to limit update frequency
@@ -36,8 +33,6 @@ interface AxisDashboardProps {
 }
 
 const AxisDashboard: React.FC<AxisDashboardProps> = ({ 
-  leadIMeasurements, 
-  leadIIMeasurements,
   arrowColor = '#0066cc', // Default to blue
   selectedAxisType = '',
   axisAngle = 60, // Default if not provided
@@ -58,17 +53,8 @@ const AxisDashboard: React.FC<AxisDashboardProps> = ({
   }, [axisAngle]);
   
   // Default QRS measurements if not provided
-  const defaultQRSMeasurements: QRSMeasurements = {
-    qDuration: 1,
-    qAmplitude: 0,
-    rAmplitude: 1,
-    sAmplitude: 0,
-    sDuration: 1
-  };
   
   // Use provided measurements or defaults
-  const safeLeadIMeasurements = leadIMeasurements || defaultQRSMeasurements;
-  const safeLeadIIMeasurements = leadIIMeasurements || defaultQRSMeasurements;
   
   /* 
   // This effect is no longer needed since we use the parent's axis angle
@@ -293,20 +279,8 @@ const AxisDashboard: React.FC<AxisDashboardProps> = ({
   }, [selectedAxisType, onAxisChange]);
   
   // Get the classification of the current axis angle
-  const axisClassification = classifyAxisValue(axisAngle);
   
   // Format axis for display
-  const formatAxis = (axis: number | null): string => {
-    if (axis === null) return "N/A";
-    
-    // Round to nearest whole number
-    const roundedAxis = Math.round(axis);
-    
-    // Format with sign
-    return roundedAxis > 0 
-      ? `+${roundedAxis}°` 
-      : `${roundedAxis}°`;
-  };
 
   // Exit early if we don't have valid measurements
   if (!axisAngle) {

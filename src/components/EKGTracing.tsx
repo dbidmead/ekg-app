@@ -1,7 +1,5 @@
 import React from 'react';
 import { QRSDeflection, LimbLeadDeflections, calculateLimbLeadDeflections } from '../utils/qrsDeflectionCalculator';
-import { LEAD_ANGLES } from '../utils/axisConstants';
-import { calculateLeadProjection } from '../utils/qrsDeflectionCalculator';
 
 interface EKGTracingProps {
   lead: string;
@@ -20,7 +18,6 @@ interface EKGTracingProps {
 
 const EKGTracing: React.FC<EKGTracingProps> = ({ 
   lead, 
-  height = 125, 
   width = 375,
   qrsDeflections,
   axisAngle = 60 // Default to normal axis angle 
@@ -35,7 +32,6 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
 
   const getPathForLead = (lead: string): string => {
     const centerX = viewBoxWidth / 2;
-    const ekgWidth = viewBoxWidth * 0.8;
     
     // Standard ECG measurements (6.25px = 1mm)
     const mmToPx = 6.25; // Convert millimeters to pixels at 125% scale
