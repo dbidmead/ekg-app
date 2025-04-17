@@ -2,16 +2,39 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Redirecting...</title>
+  <title>Single Page App Redirect</title>
   <script>
-    // Get the current path, excluding the base URL
-    const path = window.location.pathname.replace(/^\/ekg-app\/?/, '');
+    // Single Page Apps for GitHub Pages
+    // MIT License
+    // https://github.com/rafgraph/spa-github-pages
+    // This script takes the current URL and converts the path and query
+    // string into just a query string, and then redirects the browser
+    // to the new URL with only a query string and hash fragment.
     
-    // Redirect to root with the path as a query parameter
-    window.location.href = `/ekg-app/?path=${encodeURIComponent(path)}`;
+    // Redirect to the actual site base URL
+    const segmentCount = 1; // For "username.github.io/repo-name", this should be 1
+    const l = window.location;
+    
+    // GitHub Pages repo name
+    const repoName = 'ekg-app';
+    
+    const redirectUrl = 
+      l.protocol + '//' + l.hostname + 
+      (l.port ? ':' + l.port : '') +
+      '/' + repoName + '/' +
+      l.pathname
+        .split('/')
+        .slice(segmentCount + 1)
+        .join('/') +
+      (l.search ? l.search : '') +
+      (l.hash ? l.hash : '');
+    
+    console.log('Redirecting to:', redirectUrl);
+    window.location.replace(redirectUrl);
   </script>
 </head>
 <body>
-  <p>Redirecting...</p>
+  <h1>Redirecting...</h1>
+  <p>If you are not redirected automatically, <a href="/ekg-app/">click here</a>.</p>
 </body>
 </html> 

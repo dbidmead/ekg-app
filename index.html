@@ -5,7 +5,18 @@
     <link rel="icon" type="image/svg+xml" href="/ekg-app/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EKG Axis Trainer</title>
-    <script type="module" crossorigin src="/ekg-app/assets/index-Cu5Knw5k.js"></script>
+    <!-- Fix for GitHub Pages direct loading of source files -->
+    <script type="text/javascript">
+      // Check if we're getting a 404 when trying to load the entry point
+      window.addEventListener('error', function(e) {
+        const target = e.target;
+        if (target && target.tagName === 'SCRIPT' && target.src && target.src.includes('/src/main.tsx')) {
+          console.log('Detected attempt to load source file directly. Redirecting to built file.');
+          window.location.href = '/ekg-app/';
+        }
+      }, true);
+    </script>
+    <script type="module" crossorigin src="/ekg-app/assets/index-B_Wpl6Cl.js"></script>
     <link rel="stylesheet" crossorigin href="/ekg-app/assets/index-DXBVetyz.css">
   </head>
   <body>
