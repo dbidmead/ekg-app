@@ -4,18 +4,28 @@
   <meta charset="utf-8">
   <title>Page Not Found</title>
   <script>
-    // Single Page Apps for GitHub Pages
-    // https://github.com/rafgraph/spa-github-pages
-    const pathSegmentsToKeep = 1; // Keeps /ekg-app/ but nothing after
+    // SPA for GitHub Pages - Handles routing for single page apps
+    // Modified from https://github.com/rafgraph/spa-github-pages
     
-    const l = window.location;
-    const redirectUrl = 
-      l.protocol + '//' + l.hostname + 
-      (l.port ? ':' + l.port : '') +
-      l.pathname.split('/').slice(0, pathSegmentsToKeep + 1).join('/') + '/' +
-      (l.hash ? l.hash : '');
+    // This script checks to see if a redirect is present in the query string.
+    // If no redirect is present, it attempts to route to the current path.
     
-    window.location.replace(redirectUrl);
+    (function() {
+      // Detect the repository name from the URL
+      const repoName = location.pathname.split('/')[1];
+      
+      // Redirect all requests to the index.html page
+      const segmentCount = 1; // For username.github.io/repo-name, this should be 1
+      
+      const l = window.location;
+      const redirectUrl = 
+        l.protocol + '//' + l.hostname + 
+        (l.port ? ':' + l.port : '') +
+        '/' + repoName + '/' + 
+        (l.hash ? l.hash : '');
+      
+      window.location.replace(redirectUrl);
+    })();
   </script>
 </head>
 <body>
