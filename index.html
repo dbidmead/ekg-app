@@ -5,19 +5,16 @@
     <link rel="icon" type="image/svg+xml" href="/ekg-app/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EKG Axis Trainer</title>
-    <!-- Fix for GitHub Pages direct loading of source files -->
     <script type="text/javascript">
-      // Check if we're getting a 404 when trying to load the entry point
-      window.addEventListener('error', function(e) {
-        const target = e.target;
-        if (target && target.tagName === 'SCRIPT' && target.src && target.src.includes('/src/main.tsx')) {
-          console.log('Detected attempt to load source file directly. Redirecting to built file.');
-          window.location.href = '/ekg-app/';
-        }
-      }, true);
+      // Check if we're in a production environment (GitHub Pages)
+      // In dev, the URL will be localhost, in prod it will contain github.io
+      if (window.location.hostname.includes('github.io')) {
+        // Redirect to the index.html that was built by Vite
+        window.location.replace('/ekg-app/');
+      }
     </script>
-    <script type="module" crossorigin src="/ekg-app/assets/index-C8L-5_GG.js"></script>
-    <link rel="stylesheet" crossorigin href="/ekg-app/assets/index-DXBVetyz.css">
+    <script type="module" crossorigin src="/ekg-app/assets/main-BA9WD2fi.js"></script>
+    <link rel="stylesheet" crossorigin href="/ekg-app/assets/main-DXBVetyz.css">
   </head>
   <body>
     <div id="root"></div>
