@@ -1,0 +1,60 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]  # or your default branch
+  workflow_dispatch:  # allows manual trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build
+        run: |
+          # Create a prod-specific index.html
+          cat > index.html << EOL
+          <!DOCTYPE html>
+          <html lang="en">
+            <head>
+              <meta charset="UTF-8" />
+              <link rel="icon" type="image/svg+xml" href="./vite.svg" />
+              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <title>EKG Axis Trainer</title>
+              <script>
+                // Redirect non-GitHub Pages requests
+                if (window.location.hostname !== 'dbidmead.github.io') {
+                  // On localhost or other domain, don't redirect
+                } else if (!window.location.pathname.startsWith('/ekg-app/')) {
+                  // On GitHub Pages but not on the repo path, redirect
+                  window.location.replace('/ekg-app/');
+                }
+              </script>
+            </head>
+            <body>
+              <div id="root"></div>
+              <script type="module" src="./src/main.tsx"></script>
+            </body>
+          </html>
+          EOL
+          
+          # Build with relative paths instead of absolute
+          npm run build
+          
+          # Create .nojekyll file to disable Jekyll processing
+          touch dist/.nojekyll
+          
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
+          branch: gh-pages 

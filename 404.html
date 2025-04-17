@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <script>
+    // Get the current path, excluding the base URL
+    const path = window.location.pathname.replace(/^\/ekg-app\/?/, '');
+    
+    // Redirect to root with the path as a query parameter
+    window.location.href = `/ekg-app/?path=${encodeURIComponent(path)}`;
+  </script>
+</head>
+<body>
+  <p>Redirecting...</p>
+</body>
+</html> 

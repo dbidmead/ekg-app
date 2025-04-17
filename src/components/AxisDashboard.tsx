@@ -16,7 +16,7 @@ const throttle = (fn: Function, delay: number) => {
 
 // Debounce function to delay execution until after a pause
 const debounce = (fn: Function, delay: number) => {
-  let timeoutId: number;
+  let timeoutId: ReturnType<typeof setTimeout>;
   return (...args: any[]) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => fn(...args), delay);
