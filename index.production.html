@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/ekg-app/assets/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EKG Axis Trainer</title>
+    <script>
+      // Ensure we're on the correct URL
+      if (window.location.pathname === '/ekg-app' || window.location.pathname === '/ekg-app/') {
+        // Already on the correct path, no need to do anything
+      } else if (window.location.pathname.startsWith('/ekg-app/')) {
+        // We're on a subpath, let's handle routes in the SPA
+        // No action needed, React Router will handle this
+      } else if (window.location.hostname.includes('github.io')) {
+        // We're on GitHub Pages but not on the correct path, redirect
+        window.location.replace('/ekg-app/');
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Note: Vite will replace these with the correct hashed filenames during build -->
+    <!-- We explicitly use the ekg-app prefix for GitHub Pages -->
+    <script type="module" src="/ekg-app/assets/index.js"></script>
+  </body>
+</html> 
