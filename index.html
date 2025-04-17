@@ -7,16 +7,27 @@
     <title>EKG Axis Trainer</title>
     <script type="text/javascript">
       // Check if we're in a production environment (GitHub Pages)
-      // In dev, the URL will be localhost, in prod it will contain github.io
       if (window.location.hostname.includes('github.io')) {
-        // Redirect to the index.html that was built by Vite
+        // Force a redirect to the properly built app
         window.location.replace('/ekg-app/');
       }
+
+      // Add a fallback for script load errors
+      window.addEventListener('error', function(e) {
+        if (e.target && e.target.tagName === 'SCRIPT' && 
+            e.target.src && e.target.src.includes('/src/main.tsx')) {
+          console.error('Error loading script:', e);
+          window.location.replace('/ekg-app/');
+          e.preventDefault();
+          return false;
+        }
+      }, true);
     </script>
-    <script type="module" crossorigin src="/ekg-app/assets/main-BA9WD2fi.js"></script>
-    <link rel="stylesheet" crossorigin href="/ekg-app/assets/main-DXBVetyz.css">
+    <script type="module" crossorigin src="/ekg-app/assets/main-B5Qt9EMX.js"></script>
   </head>
   <body>
     <div id="root"></div>
+    <script type="module" src="/ekg-app/src/main.tsx"></script>
   </body>
 </html>
+
