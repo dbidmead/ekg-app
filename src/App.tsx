@@ -3,8 +3,8 @@ import './App.css'
 import EKGTracing from './components/EKGTracing'
 import AxisDashboard from './components/AxisDashboard'
 import { QRSMeasurements } from './utils/axisCalculations'
-import { AXIS_SAMPLE_DATA, AXIS_VALUES, AXIS_TYPE_MAP } from './utils/axisConstants'
-import { QRSDeflection, LimbLeadDeflections, generateRealisticQRSDeflections } from './utils/qrsDeflectionCalculator'
+import { AXIS_SAMPLE_DATA } from './utils/axisConstants'
+import { LimbLeadDeflections, generateRealisticQRSDeflections } from './utils/qrsDeflectionCalculator'
 
 // More aggressive caching mechanism for QRS deflections
 const cachedDeflections = new Map<number, LimbLeadDeflections>();
@@ -193,9 +193,6 @@ const App: React.FC = () => {
     });
   }, []);
 
-  // Flag to determine which approach to use for EKG rendering
-  const useDirectAngleApproach = true;
-
   return (
     <>
       <div className="app-container">
@@ -207,37 +204,37 @@ const App: React.FC = () => {
               <div className="lead-container">
                 <h3>Lead I</h3>
                 <div className="tracing-container">
-                  <EKGTracing lead="I" axisAngle={axisAngle} />
+                  <EKGTracing lead="I" axisAngle={axisAngle} qrsDeflections={qrsDeflections} />
                 </div>
               </div>
               <div className="lead-container">
                 <h3>aVR</h3>
                 <div className="tracing-container">
-                  <EKGTracing lead="aVR" axisAngle={axisAngle} />
+                  <EKGTracing lead="aVR" axisAngle={axisAngle} qrsDeflections={qrsDeflections} />
                 </div>
               </div>
               <div className="lead-container">
                 <h3>Lead II</h3>
                 <div className="tracing-container">
-                  <EKGTracing lead="II" axisAngle={axisAngle} />
+                  <EKGTracing lead="II" axisAngle={axisAngle} qrsDeflections={qrsDeflections} />
                 </div>
               </div>
               <div className="lead-container">
                 <h3>aVL</h3>
                 <div className="tracing-container">
-                  <EKGTracing lead="aVL" axisAngle={axisAngle} />
+                  <EKGTracing lead="aVL" axisAngle={axisAngle} qrsDeflections={qrsDeflections} />
                 </div>
               </div>
               <div className="lead-container">
                 <h3>Lead III</h3>
                 <div className="tracing-container">
-                  <EKGTracing lead="III" axisAngle={axisAngle} />
+                  <EKGTracing lead="III" axisAngle={axisAngle} qrsDeflections={qrsDeflections} />
                 </div>
               </div>
               <div className="lead-container">
                 <h3>aVF</h3>
                 <div className="tracing-container">
-                  <EKGTracing lead="aVF" axisAngle={axisAngle} />
+                  <EKGTracing lead="aVF" axisAngle={axisAngle} qrsDeflections={qrsDeflections} />
                 </div>
               </div>
             </div>
@@ -282,6 +279,8 @@ const App: React.FC = () => {
                   onAxisChange={handleAxisChange}
                   selectedAxisType={selectedAxis}
                   arrowColor="#0066cc"
+                  leadIMeasurements={leadIMeasurements}
+                  leadIIMeasurements={leadIIMeasurements}
                 />
               </div>
             </div>

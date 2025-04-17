@@ -1,12 +1,9 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { QRSMeasurements, calculateQRSArea, calculateQRSAxis } from '../utils/axisCalculations';
+import React, { useRef, useEffect, useCallback } from 'react';
+import { QRSMeasurements } from '../utils/axisCalculations';
 import { 
-  getAxisValueFromType, 
-  classifyAxisValue, 
-  getRandomValueInAxisRange, 
-  getAxisRangeFromType
+  classifyAxisValue
 } from '../utils/axisConstants';
-import { generateRealisticQRSDeflections, QRSDeflection, LimbLeadDeflections } from '../utils/qrsDeflectionCalculator';
+import { generateRealisticQRSDeflections, LimbLeadDeflections } from '../utils/qrsDeflectionCalculator';
 
 // Simple throttle function to limit update frequency
 const throttle = (fn: Function, delay: number) => {
@@ -60,10 +57,6 @@ const AxisDashboard: React.FC<AxisDashboardProps> = ({
     lastAngle.current = axisAngle;
   }, [axisAngle]);
   
-  // Calculate areas with error handling
-  let leadIArea = 0;
-  let leadIIArea = 0;
-  
   // Default QRS measurements if not provided
   const defaultQRSMeasurements: QRSMeasurements = {
     qDuration: 1,
@@ -77,13 +70,6 @@ const AxisDashboard: React.FC<AxisDashboardProps> = ({
   const safeLeadIMeasurements = leadIMeasurements || defaultQRSMeasurements;
   const safeLeadIIMeasurements = leadIIMeasurements || defaultQRSMeasurements;
   
-  try {
-    leadIArea = calculateQRSArea(safeLeadIMeasurements);
-    leadIIArea = calculateQRSArea(safeLeadIIMeasurements);
-  } catch (error) {
-    // Silently handle error
-  }
-
   /* 
   // This effect is no longer needed since we use the parent's axis angle
   // Set initial axis angle based on measurements
@@ -308,9 +294,7 @@ const AxisDashboard: React.FC<AxisDashboardProps> = ({
   
   // Get the classification of the current axis angle
   const axisClassification = classifyAxisValue(axisAngle);
-  // Determine class for the axis value display based on classification
-  const axisValueClass = `axis-value ${axisClassification === 'Normal Axis' ? 'normal' : 'abnormal'}`;
-
+  
   // Format axis for display
   const formatAxis = (axis: number | null): string => {
     if (axis === null) return "N/A";
