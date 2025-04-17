@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Page</title>
+</head>
+<body>
+  <h1>Test Page</h1>
+  <p>This is a test to see if scripts load correctly</p>
+  <script>
+    console.log("Test page loaded successfully");
+    // Try to load the main script directly
+    fetch('/ekg-app/assets/index-B28EOGEt.js')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to load script: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then(text => {
+        console.log("Script loaded successfully", text.substring(0, 100) + "...");
+      })
+      .catch(error => {
+        console.error("Error loading script:", error);
+        document.body.innerHTML += `<p style="color:red">Error: ${error.message}</p>`;
+      });
+  </script>
+</body>
+</html> 

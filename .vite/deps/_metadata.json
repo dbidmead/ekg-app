@@ -1,0 +1,34 @@
+{
+  "hash": "158b76c3",
+  "configHash": "2ed41ce2",
+  "lockfileHash": "e3b0c442",
+  "browserHash": "30f87014",
+  "optimized": {
+    "react": {
+      "src": "../../ekg-app/node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "a4e353dc",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../ekg-app/node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "79c1afcc",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../ekg-app/node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "ddd9c64f",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-OHWKJXOW": {
+      "file": "chunk-OHWKJXOW.js"
+    },
+    "chunk-MV4ORNPZ": {
+      "file": "chunk-MV4ORNPZ.js"
+    }
+  }
+}

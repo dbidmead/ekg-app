@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EKG App - Development</title>
+</head>
+<body>
+  <div id="root"></div>
+  <!-- Separate script load to avoid bundling issues -->
+  <script>
+    // Create and append script element programmatically
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = '/src/main.tsx';
+    document.body.appendChild(script);
+  </script>
+</body>
+</html> 

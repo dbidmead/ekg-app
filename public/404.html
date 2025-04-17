@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Page Not Found</title>
+  <script>
+    // Single-page app routing for GitHub Pages
+    // Based on https://github.com/rafgraph/spa-github-pages
+    
+    // Immediate redirect to the base URL with hash routing for cleaner UX
+    (function() {
+      var pathSegmentsToKeep = 1; // Keep /ekg-app/ but strip the rest
+      var currentPath = window.location.pathname;
+      
+      // If we're already on /ekg-app/, don't redirect
+      if (currentPath === '/ekg-app/' || currentPath === '/ekg-app') {
+        return;
+      }
+      
+      // GitHub Pages repo name (hard-coded for simplicity)
+      var repoName = 'ekg-app';
+      
+      // Path stripping - keep only segments we need
+      var newPath = currentPath;
+      if (currentPath.indexOf('/' + repoName + '/') === 0) {
+        // We're already within the app path
+        newPath = currentPath.substring(repoName.length + 1);
+      }
+      
+      // Create the redirect URL - use hash-based routing to avoid repeated 404s
+      var redirectUrl = window.location.protocol + '//' + window.location.hostname + 
+                        (window.location.port ? ':' + window.location.port : '') +
+                        '/' + repoName + '/#' + newPath +
+                        window.location.search;
+      
+      // Redirect immediately
+      window.location.replace(redirectUrl);
+    })();
+  </script>
+</head>
+<body>
+  <h1>Redirecting...</h1>
+  <p>If you are not redirected automatically, <a href="/ekg-app/">click here</a>.</p>
+</body>
+</html> 
