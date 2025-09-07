@@ -29,12 +29,16 @@ leadIII = createQRSDeflection(axisAngle, 120°, baseAmplitude)
 ```
 **Mathematical Formula**: `cos(120° - axisAngle)`
 
-### **aVR: UNCHANGED** ✅
+### **aVR: CHANGED** 🔄
 ```javascript
-// BEFORE and AFTER (identical):
-aVR.r = -(leadI.r + leadII.r) / 2    // Mathematical averaging works well
+// BEFORE (Mathematical Derivation):
+aVR.r = -(leadI.r + leadII.r) / 2
 aVR.s = -(leadI.s + leadII.s) / 2
+
+// AFTER (Direct Vector Projection):
+aVR = createQRSDeflection(axisAngle, -150°, baseAmplitude)
 ```
+**Mathematical Formula**: `cos(-150° - axisAngle)`
 
 ### **aVL: CHANGED** 🔄
 ```javascript
@@ -150,11 +154,11 @@ The new method provides:
 
 ### **Leads That Are 100% Identical**:
 - **Lead I**: Exactly the same (direct projection)
-- **Lead II**: Exactly the same (direct projection)  
-- **aVR**: Exactly the same (averaging method preserved)
+- **Lead II**: Exactly the same (direct projection)
 
 ### **Leads With Close Approximation**:
 - **Lead III**: Often identical, sometimes differs by <5%
+- **aVR**: Usually within 10-15% of original values
 - **aVL**: Usually within 10-15% of original values
 - **aVF**: Usually within 10-15% of original values
 
@@ -187,7 +191,7 @@ return 'Extreme Axis Deviation';
 ## Conclusion
 
 ### **What Changed**: 
-Calculation method for Lead III, aVL, and aVF
+Calculation method for Lead III, aVR, aVL, and aVF - all now use unified direct vector projection
 
 ### **What Stayed the Same**: 
 - Core vector mathematics

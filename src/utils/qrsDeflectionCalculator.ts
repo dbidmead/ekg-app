@@ -69,7 +69,6 @@ const MIN_R_FOR_EXTREME_NEGATIVE = 0.05; // Increased from 0.02
 export const generateQRSDeflection = (projection: number, baseAmplitude: number): QRSDeflection => {
   // Handle invalid input values
   if (projection === undefined || baseAmplitude === undefined || isNaN(projection) || isNaN(baseAmplitude)) {
-    console.warn("Invalid inputs to generateQRSDeflection", { projection, baseAmplitude });
     return { q: 0, r: 1, s: 0 }; // Return safe default values
   }
 
@@ -242,132 +241,6 @@ export const generateQRSDeflection = (projection: number, baseAmplitude: number)
 };
 
 /**
- * Validates that the deflections satisfy Einthoven's law: Lead III = Lead II - Lead I
- * Makes adjustments if needed to ensure the relationship is maintained
- */
-export const validateEinthovenLaw = (deflections: LimbLeadDeflections): LimbLeadDeflections => {
-  // Create a copy of the deflections to avoid modifying the original
-  const validatedDeflections = { ...deflections };
-  
-  // Ensure all lead values exist to prevent undefined errors
-  // Check limb leads
-  if (!validatedDeflections.leadI || !validatedDeflections.leadII || !validatedDeflections.leadIII) {
-    // Create default values for any missing leads
-    if (!validatedDeflections.leadI) {
-      validatedDeflections.leadI = { 
-        q: -MIN_CLINICAL_VALUES.Q_AMPLITUDE, 
-        r: MIN_CLINICAL_VALUES.R_AMPLITUDE, 
-        s: -MIN_CLINICAL_VALUES.S_AMPLITUDE 
-      };
-    }
-    
-    if (!validatedDeflections.leadII) {
-      validatedDeflections.leadII = { 
-        q: -MIN_CLINICAL_VALUES.Q_AMPLITUDE, 
-        r: MIN_CLINICAL_VALUES.R_AMPLITUDE, 
-        s: -MIN_CLINICAL_VALUES.S_AMPLITUDE 
-      };
-    }
-    
-    if (!validatedDeflections.leadIII) {
-      validatedDeflections.leadIII = { 
-        q: -MIN_CLINICAL_VALUES.Q_AMPLITUDE, 
-        r: MIN_CLINICAL_VALUES.R_AMPLITUDE, 
-        s: -MIN_CLINICAL_VALUES.S_AMPLITUDE 
-      };
-    }
-  }
-  
-  // Check augmented leads
-  if (!validatedDeflections.aVR) {
-    validatedDeflections.aVR = { 
-      q: MIN_CLINICAL_VALUES.Q_AMPLITUDE, 
-      r: -MIN_CLINICAL_VALUES.R_AMPLITUDE, 
-      s: MIN_CLINICAL_VALUES.S_AMPLITUDE 
-    };
-  }
-  
-  if (!validatedDeflections.aVL) {
-    validatedDeflections.aVL = { 
-      q: -MIN_CLINICAL_VALUES.Q_AMPLITUDE, 
-      r: MIN_CLINICAL_VALUES.R_AMPLITUDE, 
-      s: -MIN_CLINICAL_VALUES.S_AMPLITUDE 
-    };
-  }
-  
-  if (!validatedDeflections.aVF) {
-    validatedDeflections.aVF = { 
-      q: -MIN_CLINICAL_VALUES.Q_AMPLITUDE, 
-      r: MIN_CLINICAL_VALUES.R_AMPLITUDE, 
-      s: -MIN_CLINICAL_VALUES.S_AMPLITUDE 
-    };
-  }
-  
-  // Check Einthoven's Law: Lead III = Lead II - Lead I
-  const expectedLeadIII = {
-    q: validatedDeflections.leadII.q - validatedDeflections.leadI.q,
-    r: validatedDeflections.leadII.r - validatedDeflections.leadI.r,
-    s: validatedDeflections.leadII.s - validatedDeflections.leadI.s
-  };
-  
-  // Calculate how far off we are from the expected values
-  const qDifference = Math.abs(validatedDeflections.leadIII.q - expectedLeadIII.q);
-  const rDifference = Math.abs(validatedDeflections.leadIII.r - expectedLeadIII.r);
-  const sDifference = Math.abs(validatedDeflections.leadIII.s - expectedLeadIII.s);
-  
-  // If the difference is significant (more than 10% of the expected value or more than 0.1 mV),
-  // adjust Lead III to match Einthoven's law
-  const significantThreshold = 0.1;
-  
-  if (qDifference > significantThreshold || 
-      rDifference > significantThreshold || 
-      sDifference > significantThreshold) {
-    
-    // Adjust Lead III to match the expected values
-    validatedDeflections.leadIII = {
-      q: expectedLeadIII.q,
-      r: expectedLeadIII.r,
-      s: expectedLeadIII.s
-    };
-    
-    // Ensure the adjusted values are reasonable
-    // Minimum amplitude for visibility
-    if (Math.abs(validatedDeflections.leadIII.r) < MIN_CLINICAL_VALUES.R_AMPLITUDE) {
-      validatedDeflections.leadIII.r = 
-        validatedDeflections.leadIII.r >= 0 
-          ? MIN_CLINICAL_VALUES.R_AMPLITUDE 
-          : -MIN_CLINICAL_VALUES.R_AMPLITUDE;
-    }
-    
-    // QRS deflections should not exceed maximum clinically relevant amplitudes
-    const maxQRSAmplitude = 6.0; // mV (increased from 3.0)
-    
-    if (Math.abs(validatedDeflections.leadIII.q) > maxQRSAmplitude) {
-      validatedDeflections.leadIII.q = 
-        validatedDeflections.leadIII.q >= 0 
-          ? maxQRSAmplitude 
-          : -maxQRSAmplitude;
-    }
-    
-    if (Math.abs(validatedDeflections.leadIII.r) > maxQRSAmplitude) {
-      validatedDeflections.leadIII.r = 
-        validatedDeflections.leadIII.r >= 0 
-          ? maxQRSAmplitude 
-          : -maxQRSAmplitude;
-    }
-    
-    if (Math.abs(validatedDeflections.leadIII.s) > maxQRSAmplitude) {
-      validatedDeflections.leadIII.s = 
-        validatedDeflections.leadIII.s >= 0 
-          ? maxQRSAmplitude 
-          : -maxQRSAmplitude;
-    }
-  }
-  
-  return validatedDeflections;
-};
-
-/**
  * Normalize deflections to ensure they're within reasonable bounds
  * @param deflections - QRS deflections for all limb leads
  * @returns Normalized deflections
@@ -531,23 +404,6 @@ function isValidNumber(value: number): boolean {
   return typeof value === 'number' && !isNaN(value) && isFinite(value);
 }
 
-// Helper function to safely calculate derived values, returning 0 if inputs are invalid
-function safelyDeriveValue(value1: number, value2: number, operation: 'add' | 'subtract' | 'average'): number {
-  if (!isValidNumber(value1) || !isValidNumber(value2)) {
-    return 0;
-  }
-  
-  switch (operation) {
-    case 'add':
-      return value1 + value2;
-    case 'subtract':
-      return value1 - value2;
-    case 'average':
-      return (value1 + value2) / 2;
-    default:
-      return 0;
-  }
-}
 
 /**
  * Calculate the QRS deflections for all 6 limb leads based on the QRS axis angle
@@ -580,31 +436,17 @@ export function calculateLimbLeadDeflections(axisAngle: number, baseAmplitude: n
   if (!isValidNumber(leadII.s)) leadII.s = 0;
   
   // Calculate Lead III using direct vector projection for proper peak morphology
-  // This ensures Lead III always has distinct peaks while maintaining clinical accuracy
-  // 
-  // NOTE: While Einthoven's Law (Lead III = Lead II - Lead I) is mathematically correct,
-  // the subtraction can create flat peaks that are confusing for medical education.
-  // Using direct vector projection preserves the clinical relationship between axis angle
-  // and Lead III amplitude while ensuring realistic QRS morphology for learning.
+  // NOTE: Using direct projection instead of Einthoven's Law (Lead II - Lead I)
+  // prevents flat peaks while maintaining clinical accuracy for education
   const leadIII_direct = createQRSDeflection(axisAngle, leadAngles.leadIII, baseAmplitude);
-  
-  // For educational clarity, use direct projection to ensure proper peak morphology
-  // while preserving the amplitude relationship to the axis angle
   const leadIII = {
     q: 0, // Always zero for educational purposes
     r: leadIII_direct.r,
     s: leadIII_direct.s
   };
   
-  // UNIFIED APPROACH: All leads now use direct vector projection for consistency
-  // This ensures uniform morphology and eliminates mathematical derivation artifacts
-  // 
-  // EDUCATIONAL DECISION: While both Einthoven's derivations and direct projection 
-  // are mathematically valid, direct projection provides:
-  // - Consistent visual morphology across all leads
-  // - No flat peaks or visual artifacts  
-  // - Same clinical accuracy and educational value
-  // - Unified mathematical approach for all 6 limb leads
+  // UNIFIED APPROACH: All augmented leads use direct vector projection
+  // This ensures consistent morphology and eliminates visual artifacts
   
   // aVR: Use direct vector projection for consistency with other leads
   const aVR_direct = createQRSDeflection(axisAngle, leadAngles.aVR, baseAmplitude);
@@ -614,8 +456,7 @@ export function calculateLimbLeadDeflections(axisAngle: number, baseAmplitude: n
     s: aVR_direct.s
   };
   
-  // aVL: Use direct vector projection to prevent flat peaks
-  // Mathematical derivation (I - II/2) can create flat peaks at certain angles
+  // aVL: Direct vector projection prevents flat peaks
   const aVL_direct = createQRSDeflection(axisAngle, leadAngles.aVL, baseAmplitude);
   const aVL = {
     q: 0, // Always zero for educational purposes
@@ -623,8 +464,7 @@ export function calculateLimbLeadDeflections(axisAngle: number, baseAmplitude: n
     s: aVL_direct.s
   };
   
-  // aVF: Use direct vector projection to prevent flat peaks  
-  // Mathematical derivation (II - I/2) can create flat peaks at certain angles
+  // aVF: Direct vector projection prevents flat peaks
   const aVF_direct = createQRSDeflection(axisAngle, leadAngles.aVF, baseAmplitude);
   const aVF = {
     q: 0, // Always zero for educational purposes
@@ -777,8 +617,6 @@ function normalizeAngle(angle: number): number {
   return angle;
 }
 
-
-
 /**
  * Generate realistic QRS deflections for the six limb leads based on the QRS axis angle
  * A convenient alias for calculateLimbLeadDeflections
@@ -789,7 +627,6 @@ export const generateRealisticQRSDeflections = (qrsAxisAngle: number): LimbLeadD
   try {
     return calculateLimbLeadDeflections(qrsAxisAngle);
   } catch (error) {
-    console.error('Error in generateRealisticQRSDeflections:', error);
     // Return default values with proper structure to prevent further errors
     return {
       leadI: { q: -MIN_CLINICAL_VALUES.Q_AMPLITUDE, r: MIN_CLINICAL_VALUES.R_AMPLITUDE, s: -MIN_CLINICAL_VALUES.S_AMPLITUDE },
