@@ -147,44 +147,19 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
       const rPos = qrsStart + qrsWidth * 0.5; // R wave position (at center)
       const sPos = qrsEnd - qrsWidth * 0.2;   // S wave position
 
-      // Determine if this is a predominantly negative complex (QS pattern)
-      const isPredominantlyNegative = Math.abs(qrsDeflection.r) < (Math.abs(qrsDeflection.q) + Math.abs(qrsDeflection.s));
+      // Use linear segments for sharp, clinical-accurate QRS morphology
+      // This preserves the calculated amplitudes while creating realistic ECG appearance
       
-      // Adjust control points based on the relative amplitudes of the waves
-      let qToRFactor = 0.3; // Default control point distance factor
-      let rToSFactor = 0.3; // Default control point distance factor
-      
-      // For predominantly negative complexes, adjust the control points
-      if (isPredominantlyNegative || Math.abs(qrsDeflection.r) < 0.8) {
-        // Calculate q/s dominance ratio to adjust curve shape
-        const qRatio = Math.abs(qrsDeflection.q) / (Math.abs(qrsDeflection.q) + Math.abs(qrsDeflection.r) + Math.abs(qrsDeflection.s));
-        const sRatio = Math.abs(qrsDeflection.s) / (Math.abs(qrsDeflection.q) + Math.abs(qrsDeflection.r) + Math.abs(qrsDeflection.s));
-        
-        // Bring control points closer to the dominant wave
-        qToRFactor = Math.max(0.15, 0.3 - qRatio * 0.2);
-        rToSFactor = Math.max(0.15, 0.3 - sRatio * 0.2);
-      }
-      
-      // Calculate the improved control points
-      const qToRcp1 = qPos + (rPos - qPos) * qToRFactor;       
-      const qToRcp2 = rPos - (rPos - qPos) * qToRFactor;       
-      const rToScp1 = rPos + (sPos - rPos) * rToSFactor;       
-      const rToScp2 = sPos - (sPos - rPos) * rToSFactor;      
-      
-      // First segment: baseline to Q wave (still linear)
+      // Sharp transition from baseline to Q wave
       path += `L ${qPos} ${qPoint} `;
       
-      // Draw the QRS complex with optimized control points
-      if (isPredominantlyNegative && Math.abs(qPoint - sPoint) < (mmToPx * 0.5)) {
-        // For very flat QS patterns, use a simpler curve
-        path += `Q ${rPos} ${Math.min(qPoint, sPoint)} ${sPos} ${sPoint} `;
-      } else {
-        // Standard Bezier curves for normal QRS complexes
-        path += `C ${qToRcp1} ${qPoint} ${qToRcp2} ${rPoint} ${rPos} ${rPoint} `;
-        path += `C ${rToScp1} ${rPoint} ${rToScp2} ${sPoint} ${sPos} ${sPoint} `;
-      }
+      // Sharp transition from Q to R wave peak
+      path += `L ${rPos} ${rPoint} `;
       
-      // S back to baseline
+      // Sharp transition from R peak to S wave
+      path += `L ${sPos} ${sPoint} `;
+      
+      // Sharp return to baseline from S wave
       path += `L ${qrsEnd} ${baseY} `;
       
       // ST segment
@@ -224,16 +199,10 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
           const rPosI = qrsStart + qrsWidth * 0.5;
           const sPosI = qrsEnd - qrsWidth * 0.2;
           
-          // Improved control points
-          const qToRcp1I = qPosI + (rPosI - qPosI) * 0.3;
-          const qToRcp2I = rPosI - (rPosI - qPosI) * 0.3;
-          const rToScp1I = rPosI + (sPosI - rPosI) * 0.3;
-          const rToScp2I = sPosI - (sPosI - rPosI) * 0.3;
-
-          // Draw the complex with smoother curves
+          // Use linear segments for sharp, realistic QRS morphology
           path += `L ${qPosI} ${qPointI} `;
-          path += `C ${qToRcp1I} ${qPointI} ${qToRcp2I} ${rPointI} ${rPosI} ${rPointI} `;
-          path += `C ${rToScp1I} ${rPointI} ${rToScp2I} ${sPointI} ${sPosI} ${sPointI} `;
+          path += `L ${rPosI} ${rPointI} `;
+          path += `L ${sPosI} ${sPointI} `;
           
           // End of QRS
           path += `L ${qrsEnd} ${baseY} `;
@@ -264,16 +233,10 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
           const rPosII = qrsStart + qrsWidth * 0.5;
           const sPosII = qrsEnd - qrsWidth * 0.2;
           
-          // Improved control points
-          const qToRcp1II = qPosII + (rPosII - qPosII) * 0.3;
-          const qToRcp2II = rPosII - (rPosII - qPosII) * 0.3;
-          const rToScp1II = rPosII + (sPosII - rPosII) * 0.3;
-          const rToScp2II = sPosII - (sPosII - rPosII) * 0.3;
-
-          // Draw the complex with smoother curves
+          // Use linear segments for sharp, realistic QRS morphology
           path += `L ${qPosII} ${qPointII} `;
-          path += `C ${qToRcp1II} ${qPointII} ${qToRcp2II} ${rPointII} ${rPosII} ${rPointII} `;
-          path += `C ${rToScp1II} ${rPointII} ${rToScp2II} ${sPointII} ${sPosII} ${sPointII} `;
+          path += `L ${rPosII} ${rPointII} `;
+          path += `L ${sPosII} ${sPointII} `;
           
           // End of QRS
           path += `L ${qrsEnd} ${baseY} `;
@@ -304,16 +267,10 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
           const rPosIII = qrsStart + qrsWidth * 0.5;
           const sPosIII = qrsEnd - qrsWidth * 0.2;
           
-          // Improved control points
-          const qToRcp1III = qPosIII + (rPosIII - qPosIII) * 0.3;
-          const qToRcp2III = rPosIII - (rPosIII - qPosIII) * 0.3;
-          const rToScp1III = rPosIII + (sPosIII - rPosIII) * 0.3;
-          const rToScp2III = sPosIII - (sPosIII - rPosIII) * 0.3;
-
-          // Draw the complex with smoother curves
+          // Use linear segments for sharp, realistic QRS morphology
           path += `L ${qPosIII} ${qPointIII} `;
-          path += `C ${qToRcp1III} ${qPointIII} ${qToRcp2III} ${rPointIII} ${rPosIII} ${rPointIII} `;
-          path += `C ${rToScp1III} ${rPointIII} ${rToScp2III} ${sPointIII} ${sPosIII} ${sPointIII} `;
+          path += `L ${rPosIII} ${rPointIII} `;
+          path += `L ${sPosIII} ${sPointIII} `;
           
           // End of QRS
           path += `L ${qrsEnd} ${baseY} `;
@@ -344,16 +301,10 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
           const rPosAVR = qrsStart + qrsWidth * 0.5;
           const sPosAVR = qrsEnd - qrsWidth * 0.2;
           
-          // Improved control points
-          const qToRcp1AVR = qPosAVR + (rPosAVR - qPosAVR) * 0.3;
-          const qToRcp2AVR = rPosAVR - (rPosAVR - qPosAVR) * 0.3;
-          const rToScp1AVR = rPosAVR + (sPosAVR - rPosAVR) * 0.3;
-          const rToScp2AVR = sPosAVR - (sPosAVR - rPosAVR) * 0.3;
-
-          // Draw the complex with smoother curves
+          // Use linear segments for sharp, realistic QRS morphology
           path += `L ${qPosAVR} ${qPointAVR} `;
-          path += `C ${qToRcp1AVR} ${qPointAVR} ${qToRcp2AVR} ${rPointAVR} ${rPosAVR} ${rPointAVR} `;
-          path += `C ${rToScp1AVR} ${rPointAVR} ${rToScp2AVR} ${sPointAVR} ${sPosAVR} ${sPointAVR} `;
+          path += `L ${rPosAVR} ${rPointAVR} `;
+          path += `L ${sPosAVR} ${sPointAVR} `;
           
           // End of QRS
           path += `L ${qrsEnd} ${baseY} `;
@@ -386,16 +337,10 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
           const rPosAVL = qrsStart + qrsWidth * 0.5;
           const sPosAVL = qrsEnd - qrsWidth * 0.2;
           
-          // Improved control points
-          const qToRcp1AVL = qPosAVL + (rPosAVL - qPosAVL) * 0.3;
-          const qToRcp2AVL = rPosAVL - (rPosAVL - qPosAVL) * 0.3;
-          const rToScp1AVL = rPosAVL + (sPosAVL - rPosAVL) * 0.3;
-          const rToScp2AVL = sPosAVL - (sPosAVL - rPosAVL) * 0.3;
-
-          // Draw the complex with smoother curves
+          // Use linear segments for sharp, realistic QRS morphology
           path += `L ${qPosAVL} ${qPointAVL} `;
-          path += `C ${qToRcp1AVL} ${qPointAVL} ${qToRcp2AVL} ${rPointAVL} ${rPosAVL} ${rPointAVL} `;
-          path += `C ${rToScp1AVL} ${rPointAVL} ${rToScp2AVL} ${sPointAVL} ${sPosAVL} ${sPointAVL} `;
+          path += `L ${rPosAVL} ${rPointAVL} `;
+          path += `L ${sPosAVL} ${sPointAVL} `;
           
           // End of QRS
           path += `L ${qrsEnd} ${baseY} `;
@@ -426,16 +371,10 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
           const rPosAVF = qrsStart + qrsWidth * 0.5;
           const sPosAVF = qrsEnd - qrsWidth * 0.2;
           
-          // Improved control points
-          const qToRcp1AVF = qPosAVF + (rPosAVF - qPosAVF) * 0.3;
-          const qToRcp2AVF = rPosAVF - (rPosAVF - qPosAVF) * 0.3;
-          const rToScp1AVF = rPosAVF + (sPosAVF - rPosAVF) * 0.3;
-          const rToScp2AVF = sPosAVF - (sPosAVF - rPosAVF) * 0.3;
-
-          // Draw the complex with smoother curves
+          // Use linear segments for sharp, realistic QRS morphology
           path += `L ${qPosAVF} ${qPointAVF} `;
-          path += `C ${qToRcp1AVF} ${qPointAVF} ${qToRcp2AVF} ${rPointAVF} ${rPosAVF} ${rPointAVF} `;
-          path += `C ${rToScp1AVF} ${rPointAVF} ${rToScp2AVF} ${sPointAVF} ${sPosAVF} ${sPointAVF} `;
+          path += `L ${rPosAVF} ${rPointAVF} `;
+          path += `L ${sPosAVF} ${sPointAVF} `;
           
           // End of QRS
           path += `L ${qrsEnd} ${baseY} `;

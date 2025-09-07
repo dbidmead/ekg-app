@@ -579,33 +579,57 @@ export function calculateLimbLeadDeflections(axisAngle: number, baseAmplitude: n
   if (!isValidNumber(leadII.r)) leadII.r = 0;
   if (!isValidNumber(leadII.s)) leadII.s = 0;
   
-  // Calculate Lead III directly using Einthoven's law: Lead III = Lead II - Lead I
+  // Calculate Lead III using direct vector projection for proper peak morphology
+  // This ensures Lead III always has distinct peaks while maintaining clinical accuracy
+  // 
+  // NOTE: While Einthoven's Law (Lead III = Lead II - Lead I) is mathematically correct,
+  // the subtraction can create flat peaks that are confusing for medical education.
+  // Using direct vector projection preserves the clinical relationship between axis angle
+  // and Lead III amplitude while ensuring realistic QRS morphology for learning.
+  const leadIII_direct = createQRSDeflection(axisAngle, leadAngles.leadIII, baseAmplitude);
+  
+  // For educational clarity, use direct projection to ensure proper peak morphology
+  // while preserving the amplitude relationship to the axis angle
   const leadIII = {
     q: 0, // Always zero for educational purposes
-    r: safelyDeriveValue(leadII.r, leadI.r, 'subtract'),
-    s: safelyDeriveValue(leadII.s, leadI.s, 'subtract')
+    r: leadIII_direct.r,
+    s: leadIII_direct.s
   };
   
-  // Calculate augmented leads directly based on their definitions
-  // aVR = -(I + II)/2
+  // UNIFIED APPROACH: All leads now use direct vector projection for consistency
+  // This ensures uniform morphology and eliminates mathematical derivation artifacts
+  // 
+  // EDUCATIONAL DECISION: While both Einthoven's derivations and direct projection 
+  // are mathematically valid, direct projection provides:
+  // - Consistent visual morphology across all leads
+  // - No flat peaks or visual artifacts  
+  // - Same clinical accuracy and educational value
+  // - Unified mathematical approach for all 6 limb leads
+  
+  // aVR: Use direct vector projection for consistency with other leads
+  const aVR_direct = createQRSDeflection(axisAngle, leadAngles.aVR, baseAmplitude);
   const aVR = {
     q: 0, // Always zero for educational purposes
-    r: -safelyDeriveValue(leadI.r, leadII.r, 'average'),
-    s: -safelyDeriveValue(leadI.s, leadII.s, 'average')
+    r: aVR_direct.r,
+    s: aVR_direct.s
   };
   
-  // aVL = (I - III)/2 = (2I - II)/2 = I - II/2
+  // aVL: Use direct vector projection to prevent flat peaks
+  // Mathematical derivation (I - II/2) can create flat peaks at certain angles
+  const aVL_direct = createQRSDeflection(axisAngle, leadAngles.aVL, baseAmplitude);
   const aVL = {
     q: 0, // Always zero for educational purposes
-    r: safelyDeriveValue(leadI.r, leadII.r / 2, 'subtract'),
-    s: safelyDeriveValue(leadI.s, leadII.s / 2, 'subtract')
+    r: aVL_direct.r,
+    s: aVL_direct.s
   };
   
-  // aVF = (II + III)/2 = (2II - I)/2 = II - I/2
+  // aVF: Use direct vector projection to prevent flat peaks  
+  // Mathematical derivation (II - I/2) can create flat peaks at certain angles
+  const aVF_direct = createQRSDeflection(axisAngle, leadAngles.aVF, baseAmplitude);
   const aVF = {
     q: 0, // Always zero for educational purposes
-    r: safelyDeriveValue(leadII.r, leadI.r / 2, 'subtract'),
-    s: safelyDeriveValue(leadII.s, leadI.s / 2, 'subtract')
+    r: aVF_direct.r,
+    s: aVF_direct.s
   };
   
   // Combine all leads
