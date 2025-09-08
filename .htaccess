@@ -1,0 +1,8 @@
+# Handle 404s by redirecting to index.html
+ErrorDocument 404 /ekg-app/index.html
+
+# Redirect /src/main.tsx explicitly
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^src/main.tsx$ /ekg-app/index.html [R=301,L]
+</IfModule> 
