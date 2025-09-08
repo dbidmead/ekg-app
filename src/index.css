@@ -18,6 +18,13 @@ html, body, #root {
   width: 100%;
 }
 
+@media (max-width: 1024px) {
+  html, body, #root {
+    height: auto;
+    min-height: 100vh;
+  }
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -32,6 +39,15 @@ body {
   display: block;
   min-width: 320px;
   min-height: 100vh;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 16px;
+    line-height: 1.4;
+  }
 }
 
 h1 {

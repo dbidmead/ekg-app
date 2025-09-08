@@ -24,7 +24,11 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
 }) => {
   // Calculate dimensions (6.25px = 1mm to match grid at 125% scale)
   const smallBoxSize = 6.25; // 1mm = 6.25px (25% larger than original 5px)
-  const viewBoxWidth = Math.ceil(width / smallBoxSize) * smallBoxSize;
+  
+  // For responsive design, use a standard viewBox width that scales well
+  // This ensures consistent proportions across different screen sizes
+  const standardViewBoxWidth = 300; // Standard width in viewBox units
+  const viewBoxWidth = standardViewBoxWidth;
   const viewBoxHeight = viewBoxWidth / 2; // maintain 2:1 aspect ratio
   const safeZoneHeight = viewBoxHeight * 0.8; // 80% of height for safe amplitude zone
   const baseY = viewBoxHeight / 2;
@@ -33,8 +37,9 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
   const getPathForLead = (lead: string): string => {
     const centerX = viewBoxWidth / 2;
     
-    // Standard ECG measurements (6.25px = 1mm)
-    const mmToPx = 6.25; // Convert millimeters to pixels at 125% scale
+    // Standard ECG measurements scaled to viewBox
+    // Scale mm to viewBox units based on standard 300-unit width
+    const mmToPx = standardViewBoxWidth / 48; // ~6.25 viewBox units per mm (300/48 = 6.25)
     
     // Timing intervals (in mm, converted to px)
     const pWaveWidth = 2 * mmToPx;     // 0.08s = 2mm
@@ -404,8 +409,13 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
       width="100%" 
       height="100%" 
       viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
-      preserveAspectRatio="xMidYMid slice"
-      style={{ width: '100%', height: '100%' }}
+      preserveAspectRatio="xMidYMid meet"
+      style={{ 
+        width: '100%', 
+        height: '100%',
+        maxWidth: '100%',
+        maxHeight: '100%'
+      }}
     >
       <path
         d={getPathForLead(lead)}

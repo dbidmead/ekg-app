@@ -366,9 +366,14 @@ const AxisDashboard: React.FC<AxisDashboardProps> = ({
         width: '100%',
         height: '100%',
         cursor: 'pointer',
-        touchAction: 'none' // Prevent default touch actions to avoid scrolling while dragging
+        touchAction: 'none', // Prevent default touch actions to avoid scrolling while dragging
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        MozUserSelect: 'none',
+        msUserSelect: 'none'
       }}
       onPointerDown={handleMouseDown}
+      onTouchStart={(e) => e.preventDefault()} // Prevent touch events from interfering
     >
       {/* Degree markers */}
       {generateDegreeMarkers()}

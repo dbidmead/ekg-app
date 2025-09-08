@@ -269,6 +269,9 @@ const App: React.FC = () => {
             </div>
             
             <div className="compass-container">
+              <div className="mobile-instructions">
+                Tap and drag the compass to adjust axis
+              </div>
               <div className="compass-circle">
                 <div className="compass-marker right">0°</div>
                 <div className="compass-marker bottom">+90°</div>
