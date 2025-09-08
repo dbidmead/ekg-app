@@ -48,13 +48,20 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
     const stSegment = 2 * mmToPx;      // 0.08s = 2mm
     const tWaveWidth = 4 * mmToPx;     // 0.16s = 4mm
 
-    // Calculate positions
-    const pWaveStart = centerX - (pWaveWidth + prInterval + qrsWidth/2);
-    const qrsStart = centerX - qrsWidth/2;
-    const qrsEnd = centerX + qrsWidth/2;
+    // Calculate total waveform width
+    const totalWaveformWidth = pWaveWidth + prInterval + qrsWidth + stSegment + tWaveWidth;
+    const leftPadding = (viewBoxWidth - totalWaveformWidth) / 4; // Start 1/4 from left
+    const rightPadding = (viewBoxWidth - totalWaveformWidth) / 4; // End 1/4 from right
+    
+    // Calculate positions for better width utilization
+    const pWaveStart = leftPadding;
+    const pWaveEnd = pWaveStart + pWaveWidth;
+    const qrsStart = pWaveEnd + prInterval;
+    const qrsEnd = qrsStart + qrsWidth;
     const tWaveStart = qrsEnd + stSegment;
+    const tWaveEnd = tWaveStart + tWaveWidth;
 
-    // Start path from left edge
+    // Start path from left edge (full width baseline)
     let path = `M 0 ${baseY} L ${pWaveStart} ${baseY} `;
 
     // Helper function to constrain a value within safe boundaries
@@ -116,7 +123,7 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
           const aVLPWavePoint1 = constrainToSafeZone(baseY - 1 * mmToPx);
           const aVLPWavePoint2 = constrainToSafeZone(baseY + 1 * mmToPx);
           path += `Q ${pWaveStart + pWaveWidth/3} ${aVLPWavePoint1} ${pWaveStart + pWaveWidth/2} ${baseY} `;
-          path += `Q ${pWaveStart + pWaveWidth*2/3} ${aVLPWavePoint2} ${pWaveStart + pWaveWidth} ${baseY} `;
+          path += `Q ${pWaveStart + pWaveWidth*2/3} ${aVLPWavePoint2} ${pWaveEnd} ${baseY} `;
           pWaveAmplitude = 0; // Skip the standard P wave
           break;
       }
@@ -124,7 +131,7 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
       // Draw standard P wave for non-biphasic leads
       if (pWaveAmplitude !== 0) {
         const pWavePoint = constrainToSafeZone(baseY - pWaveAmplitude);
-        path += `Q ${pWaveStart + pWaveWidth/2} ${pWavePoint} ${pWaveStart + pWaveWidth} ${baseY} `;
+        path += `Q ${pWaveStart + pWaveWidth/2} ${pWavePoint} ${pWaveEnd} ${baseY} `;
       }
       
       // PR segment
@@ -182,7 +189,10 @@ const EKGTracing: React.FC<EKGTracingProps> = ({
       }
       
       const tWavePoint = constrainToSafeZone(baseY - tWaveHeight);
-      path += `Q ${tWaveStart + tWaveWidth/2} ${tWavePoint} ${tWaveStart + tWaveWidth} ${baseY} `;
+      path += `Q ${tWaveStart + tWaveWidth/2} ${tWavePoint} ${tWaveEnd} ${baseY} `;
+      
+      // Extend baseline to right edge
+      path += `L ${viewBoxWidth} ${baseY} `;
     } else {
       // Fallback to static tracings if no deflections provided
       switch (lead) {
