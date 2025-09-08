@@ -112,16 +112,16 @@ html, body, #root {
     height: auto;
     min-height: 100vh;
     max-height: none;
-    position: static;
+    position: relative;
     transform: none;
     top: auto;
     left: auto;
     width: 100%;
     max-width: none;
-    padding: 0.5rem;
+    padding: 1rem;
     overflow: visible;
-    overflow-y: visible;
     gap: 1rem;
+    margin: 0;
   }
 }
 
